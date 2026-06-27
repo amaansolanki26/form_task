@@ -1,0 +1,22 @@
+[
+    {
+        "firstName": "amaan",
+        "lastName": "string",
+        "email": "user@example.com",
+        "phone": "string",
+        "dob": "string",
+        "gender": "string",
+        "companyName": "string",
+        "designation": "string",
+        "department": "string",
+        "companyEmail": "user@example.com",
+        "website": "string",
+        "gstNumber": "string",
+        "address": "string",
+        "city": "string",
+        "state": "string",
+        "country": "string",
+        "zipCode": "string",
+        "id": 1
+    }
+]
