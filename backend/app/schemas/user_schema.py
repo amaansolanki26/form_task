@@ -16,7 +16,7 @@ class PersonalInfo(BaseModel):
     lastName: str
     email: EmailStr
     phone: str
-    dob: date                   
+    dob: str                   
     gender: str
 
     address: Address             

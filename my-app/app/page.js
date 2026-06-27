@@ -5,120 +5,40 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useState } from "react";
+import { useState } from "react";      
+import { createUser } from "../service/userService"
 
 
-const schema = yup.object({
-
-  firstName: yup
-    .string()
-    .min(2, "First name must be at least 2 characters")
-    .max(50, "First name must be at most 50 characters")
-    .matches(/^[a-zA-Z\s]+$/, "First name must contain only letters")
-    .required("First name is required"),
-
-  lastName: yup
-    .string()
-    .min(2, "Last name must be at least 2 characters")
-    .max(50, "Last name must be at most 50 characters")
-    .matches(/^[a-zA-Z\s]+$/, "Last name must contain only letters")
-    .required("Last name is required"),
-
-  email: yup
-    .string()
-    .email("Enter a valid email")
-    .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Enter a valid email format")
-    .required("Email is required"),
-
-  phone: yup
-    .string()
-    .matches(/^[6-9][0-9]{9}$/, "Phone must be a valid 10-digit Indian number")
-    .required("Phone number is required"),
-
-  gender: yup
-    .string()
-    .oneOf(["male", "female", "other"], "Select a valid gender")
-    .required("Gender is required"),
-
-  dob: yup
-    .string()
-    .test("dob", "You must be at least 18 years old", (value) => {
-      if (!value) return false;
-      const today = new Date();
-      const birthDate = new Date(value);
-      const age = today.getFullYear() - birthDate.getFullYear();
-      return age >= 18;
-    })
-    .required("Date of birth is required"),
-
-  companyName: yup
-    .string()
-    .min(2, "Company name must be at least 2 characters")
-    .max(100, "Company name must be at most 100 characters")
-    .required("Company name is required"),
-
-  designation: yup
-    .string()
-    .min(2, "Designation must be at least 2 characters")
-    .max(100, "Designation must be at most 100 characters")
-    .required("Designation is required"),
-
-  department: yup
-    .string()
-    .min(2, "Department must be at least 2 characters")
-    .max(100, "Department must be at most 100 characters")
-    .required("Department is required"),
-
-  companyEmail: yup
-    .string()
-    .email("Enter a valid company email")
-    .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Enter a valid company email format")
-    .required("Company email is required"),
-
-  website: yup
-    .string()
-    .url("Enter a valid website URL")
-    .matches(/^(https?:\/\/)/, "Website must start with http:// or https://")
-    .required("Website is required"),
-
-  gstNumber: yup
-    .string()
-    .matches(
-      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
-      "Enter a valid GST number (e.g. 22AAAAA0000A1Z5)"
-    )
-    .required("GST number is required"),
-
-  address: yup
-    .string()
-    .min(10, "Address must be at least 10 characters")
-    .max(255, "Address must be at most 255 characters")
-    .required("Address is required"),
-
-  city: yup
-    .string()
-    .min(2, "City must be at least 2 characters")
-    .matches(/^[a-zA-Z\s]+$/, "City must contain only letters")
-    .required("City is required"),
-
-  state: yup
-    .string()
-    .min(2, "State must be at least 2 characters")
-    .matches(/^[a-zA-Z\s]+$/, "State must contain only letters")
-    .required("State is required"),
-
-  country: yup
-    .string()
-    .min(2, "Country must be at least 2 characters")
-    .matches(/^[a-zA-Z\s]+$/, "Country must contain only letters")
-    .required("Country is required"),
-
-  zipCode: yup
-    .string()
-    .matches(/^[1-9][0-9]{5}$/, "Enter a valid 6-digit ZIP code")
-    .required("ZIP code is required"),
-
+const personalSchema = yup.object({
+  firstName: yup.string().min(2).max(50).matches(/^[a-zA-Z\s]+$/, "Only letters allowed").required(),
+  lastName: yup.string().min(2).max(50).matches(/^[a-zA-Z\s]+$/, "Only letters allowed").required(),
+  email: yup.string().email("Invalid email").required(),
+  phone: yup.string().matches(/^[6-9][0-9]{9}$/, "Valid 10-digit Indian number").required(),
+  dob: yup.string().required("Date of birth is required"),
+  gender: yup.string().oneOf(["male", "female", "other"]).required(),
+  
+  address: yup.string().min(10).max(255).required(),
+  city: yup.string().min(2).matches(/^[a-zA-Z\s]+$/, "Only letters").required(),
+  state: yup.string().min(2).matches(/^[a-zA-Z\s]+$/, "Only letters").required(),
+  country: yup.string().min(2).matches(/^[a-zA-Z\s]+$/, "Only letters").required(),
+  zipCode: yup.string().matches(/^[1-9][0-9]{5}$/, "6-digit ZIP code").required(),
 });
+
+const companySchema = yup.object({
+  companyName: yup.string().min(2).max(100).required(),
+  designation: yup.string().min(2).max(100).required(),
+  department: yup.string().min(2).max(100).required(),
+  companyEmail: yup.string().email("Invalid company email").required(),
+  website: yup.string().url().matches(/^(https?:\/\/)/, "Must start with http:// or https://").required(),
+  gstNumber: yup.string().matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, "Invalid GST number").required(),
+
+  address: yup.string().min(10).max(255).required(),
+  city: yup.string().min(2).matches(/^[a-zA-Z\s]+$/, "Only letters").required(),
+  state: yup.string().min(2).matches(/^[a-zA-Z\s]+$/, "Only letters").required(),
+  country: yup.string().min(2).matches(/^[a-zA-Z\s]+$/, "Only letters").required(),
+  zipCode: yup.string().matches(/^[1-9][0-9]{5}$/, "6-digit ZIP code").required(),
+});
+
 const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-1">
     <label className="text-sm font-medium text-gray-600">
@@ -134,42 +54,112 @@ const Field = ({ label, error, children }) => (
 );
 
 export default function RegistrationForm() {
-  const [submitted, setSubmitted] = useState({
-    personal: false,
-    company: false,
-  });
+  const [submitted, setSubmitted] = useState({ personal: false, company: false });
+  const [loading, setLoading] = useState(false);
 
   const personalForm = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(personalSchema),
     mode: "onBlur",
   });
 
   const companyForm = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(companySchema),
     mode: "onBlur",
   });
 
   const inputClass = (form, field) => {
     const errors = form.formState.errors;
     return `w-full border rounded-lg px-3 py-2.5 text-sm outline-none transition focus:ring-2 ${
-      errors[field]
-        ? "border-red-400 focus:ring-red-100"
-        : "border-gray-300 focus:ring-blue-100 focus:border-blue-400"
+      errors[field] ? "border-red-400 focus:ring-red-100" : "border-gray-300 focus:ring-blue-100 focus:border-blue-400"
     }`;
   };
 
-  const onPersonalSubmit = (data) => {
-    console.log("Personal + Address Data:", data);
-    toast.success("Personal information saved successfully!");
-    setSubmitted(prev => ({ ...prev, personal: true }));
-  };
+  const onPersonalSubmit = async (personalData) => {
+    setLoading(true);
+    try {
+        const payload = {
+            personal: {
+                firstName: personalData.firstName,
+                lastName: personalData.lastName,
+                email: personalData.email,
+                phone: personalData.phone,
+                dob: personalData.dob,
+                gender: personalData.gender,
+                address: {
+                    address: personalData.address,
+                    city: personalData.city,
+                    state: personalData.state,
+                    country: personalData.country,
+                    zipCode: personalData.zipCode,
+                }
+            },
+            company: null,
+        };
 
-  const onCompanySubmit = (data) => {
-    console.log("Company + Address Data:", data);
-    toast.success("Company information saved successfully!");
-    setSubmitted(prev => ({ ...prev, company: true }));
-  };
+        await createUser(payload);
+        toast.success("Personal information saved successfully!");
+        setSubmitted(prev => ({ ...prev, personal: true }));
 
+    } catch (error) {
+        toast.error(error.response?.data?.detail || "Failed to save personal data");
+    } finally {
+        setLoading(false);
+    }
+};
+
+  const onCompanySubmit = async (companyData) => {
+    if (!submitted.personal) {
+        toast.error("Please save Personal Information first!");
+        return;
+    }
+
+    setLoading(true);
+    try {
+        const personalData = personalForm.getValues();
+        const payload = {
+            personal: {
+                firstName: personalData.firstName,
+                lastName: personalData.lastName,
+                email: personalData.email,
+                phone: personalData.phone,
+                dob: personalData.dob,
+                gender: personalData.gender,
+                address: {
+                    address: personalData.address,
+                    city: personalData.city,
+                    state: personalData.state,
+                    country: personalData.country,
+                    zipCode: personalData.zipCode,
+                }
+            },
+            company: {
+                companyName: companyData.companyName,
+                designation: companyData.designation,
+                department: companyData.department,
+                companyEmail: companyData.companyEmail,
+                website: companyData.website || null,
+                gstNumber: companyData.gstNumber || null,
+                address: {
+                    address: companyData.address,
+                    city: companyData.city,
+                    state: companyData.state,
+                    country: companyData.country,
+                    zipCode: companyData.zipCode,
+                }
+            }
+        };
+
+        await createUser(payload);
+        toast.success("Company information saved successfully!");
+        setSubmitted(prev => ({ ...prev, company: true }));
+        personalForm.reset();
+        companyForm.reset();
+    } catch (error) {
+        toast.error(error.response?.data?.detail || "Failed to save company data");
+    } finally {
+        setLoading(false);
+    }
+};
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-6">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -263,9 +253,10 @@ export default function RegistrationForm() {
 
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-medium transition"
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-3.5 rounded-xl font-medium transition"
               >
-                Save Personal Information
+                {loading ? "Saving..." : "Save Personal Information"}
               </button>
             </form>
           </div>
@@ -347,9 +338,10 @@ export default function RegistrationForm() {
 
               <button
                 type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-medium transition"
+                disabled={loading || !submitted.personal}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white py-3.5 rounded-xl font-medium transition"
               >
-                Save Company Information
+                {loading ? "Saving..." : "Save Company Information"}
               </button>
             </form>
           </div>

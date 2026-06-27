@@ -1,8 +1,8 @@
 
-import api from "./api";
+import api from "../helper/api";
 
 export const createUser = async (userData) => {
-    const response = await api.post("/user", userData);
+    const response = await api.post("/users/", userData);
     return response.data;
 };
 

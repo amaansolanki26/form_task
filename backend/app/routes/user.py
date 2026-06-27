@@ -11,7 +11,6 @@ def create_user(registration: UserRegistration):
 
     new_id = max([u.get("id", 0) for u in users], default=0) + 1
 
-    # Convert to dictionary
     user_dict = registration.model_dump()
     user_dict["id"] = new_id
     user_dict["created_at"] = "now" 
