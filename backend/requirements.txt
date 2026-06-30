@@ -2,3 +2,7 @@ fastapi
 uvicorn
 pydantic
 pydantic[email]
+sqlalchemy 
+pyodbc 
+python-dotenv
+razorpay
